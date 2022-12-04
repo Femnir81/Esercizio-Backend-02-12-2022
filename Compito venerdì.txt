@@ -1,0 +1,70 @@
+Create Table ANAGRAFICA (
+IDAnagrafica int primary key identity not null,
+Cognome nvarchar(max) not null,
+Nome nvarchar(max) not null,
+Indirizzo nvarchar(max) not null,
+Citta nvarchar(max) not null,
+CAP char(5) not null,
+Cod_Fisc char(16) unique not null,
+)
+
+Create Table TIPOVIOLAZIONE (
+IDViolazione int primary key identity not null,
+Descrizione nvarchar(max) not null,
+)
+
+Create Table VERBALE (
+IDVerbale int primary key identity not null,
+DataViolazione datetime not null,
+IndirizzoViolazione nvarchar(max) not null,
+NominativoAgente nvarchar(max) not null,
+DataTrascrizioneVerbale datetime not null,
+Importo money check (Importo > 0) not null,
+DecurtamentoPunti int null,
+IDAnagrafica int not null,
+IDViolazione int not null,
+
+Constraint FK_VERBALE_ANAGRAFICA
+Foreign key (IDAnagrafica) references ANAGRAFICA (IDAnagrafica),
+
+Constraint FK_VERBALE_TIPOVIOLAZIONE
+Foreign key (IDViolazione) references TIPOVIOLAZIONE (IDViolazione)
+)
+
+Select Count(*) as NumeroVerbali from VERBALE
+
+Select Count(*) as NumeroVerbali, Cognome 
+from VERBALE inner join ANAGRAFICA on VERBALE.IDAnagrafica = ANAGRAFICA.IDAnagrafica 
+group by Cognome
+
+Select Count(*) as NumeroVerbali, Descrizione 
+from VERBALE inner join TIPOVIOLAZIONE on VERBALE.IDViolazione = TIPOVIOLAZIONE.IDViolazione 
+group by Descrizione
+
+Select SUM(DecurtamentoPunti) as PuntiDecurtati, Cognome 
+from VERBALE inner join ANAGRAFICA on VERBALE.IDAnagrafica = ANAGRAFICA.IDAnagrafica 
+group by Cognome
+
+Select Cognome, Nome, DataViolazione, IndirizzoViolazione, Importo, DecurtamentoPunti 
+from ANAGRAFICA inner join VERBALE on ANAGRAFICA.IDAnagrafica = VERBALE.IDAnagrafica
+where Citta = 'LA Spezia'
+
+Select Cognome, Nome, Indirizzo, DataViolazione, Importo, DecurtamentoPunti
+from ANAGRAFICA inner join VERBALE on ANAGRAFICA.IDAnagrafica = VERBALE.IDAnagrafica
+where DataViolazione between '2022-01-10' and '2022-01-11'
+
+Select SUM(Importo) as TotaleImporti, Cognome
+from ANAGRAFICA inner join VERBALE on ANAGRAFICA.IDAnagrafica = VERBALE.IDAnagrafica
+group by Cognome
+
+Select * from ANAGRAFICA where Citta = 'La Spezia'
+
+Select Count(*) as NumeroViolazioni, NominativoAgente from VERBALE group by NominativoAgente
+
+Select Cognome, Nome, Indirizzo, DataViolazione, Importo, DecurtamentoPunti
+from ANAGRAFICA inner join VERBALE on ANAGRAFICA.IDAnagrafica = VERBALE.IDAnagrafica
+where DecurtamentoPunti > 5
+
+Select Cognome, Nome, Indirizzo, DataViolazione, Importo, DecurtamentoPunti
+from ANAGRAFICA inner join VERBALE on ANAGRAFICA.IDAnagrafica = VERBALE.IDAnagrafica
+where Importo > 100
